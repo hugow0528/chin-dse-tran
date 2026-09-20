@@ -1,10 +1,21 @@
-name = "chin-12-tran"
-compatibility_date = "2024-01-01"
+name: Deploy Cloudflare Worker
 
-[assets]
-directory = "."
-exclude = [
-  "node_modules",
-  ".git",
-  ".github"
-]
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Workers
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "latest"
