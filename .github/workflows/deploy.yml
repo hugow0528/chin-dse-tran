@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-  workflow_dispatch: # 👈 加入呢行即可支援 GitHub 介面上手動點擊部署！
+  workflow_dispatch: # 支援 GitHub 介面上手動點擊按鈕部署
 
 jobs:
   deploy:
@@ -12,14 +12,6 @@ jobs:
     steps:
       - name: Checkout repository code
         uses: actions/checkout@v4
-
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        run: npm install
 
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
