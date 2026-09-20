@@ -1,4 +1,6 @@
 name = "chin-12-tran"
-main = "src/index.js" # 如果你用 TypeScript，就寫 "src/index.ts"
 compatibility_date = "2024-01-01"
 
+# 靜態網站專用設定
+[assets]
+directory = "."
