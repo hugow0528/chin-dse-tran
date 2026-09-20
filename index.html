@@ -6,599 +6,445 @@
     <title>語譯通 - 文言文詞解練習</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #34495e;
-            --accent: #3498db;
-            --success: #2ecc71;
-            --danger: #e74c3c;
-            --bg: #f8f9fa;
-            --text: #333;
+            --primary: #4F46E5;
+            --primary-hover: #4338CA;
+            --bg: #F3F4F6;
+            --surface: #FFFFFF;
+            --text: #1F2937;
+            --text-light: #6B7280;
+            --success: #10B981;
+            --error: #EF4444;
+            --border: #E5E7EB;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, 'Microsoft JhengHei', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 0;
-            line-height: 1.6;
-        }
-
-        header {
-            background-color: var(--primary);
-            color: white;
-            text-align: center;
-            padding: 1rem 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        /* 載入資料區 */
-        .setup-section {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        textarea {
-            width: 100%;
-            height: 150px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            resize: vertical;
-            font-family: inherit;
-        }
-
-        .btn {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-            margin-top: 10px;
-        }
-
-        .btn:hover { background-color: #2980b9; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background-color: var(--bg); color: var(--text); line-height: 1.5; }
         
-        /* 控制面板 */
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-
-        select {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 1rem;
-            flex: 1;
-            min-width: 150px;
-        }
-
-        .mode-btns {
-            display: flex;
-            gap: 10px;
-            flex: 2;
-            min-width: 250px;
-        }
+        /* Header */
+        header { background-color: var(--primary); color: white; padding: 1rem; text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        header h1 { font-size: 1.5rem; margin-bottom: 0.5rem; }
         
-        .mode-btn {
-            flex: 1;
-            background: #ecf0f1;
-            color: var(--text);
-            border: 1px solid #bdc3c7;
-        }
-        .mode-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
+        /* Controls */
+        .controls-container { max-width: 800px; margin: 1rem auto; padding: 0 1rem; display: flex; flex-direction: column; gap: 1rem; }
+        select, button { padding: 0.75rem 1rem; border: 1px solid var(--border); border-radius: 0.5rem; font-size: 1rem; outline: none; background: var(--surface); cursor: pointer; }
+        select { width: 100%; appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+        
+        .mode-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .mode-tabs button { flex: 1; min-width: 80px; text-align: center; background: var(--surface); color: var(--text-light); transition: all 0.2s; font-weight: bold; }
+        .mode-tabs button.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-        /* 關鍵字高亮 */
-        .highlight {
-            color: var(--danger);
-            font-weight: bold;
-            font-size: 1.1em;
-        }
+        /* Main Content Area */
+        main { max-width: 800px; margin: 0 auto 2rem auto; padding: 0 1rem; min-height: 50vh; }
+        .hidden { display: none !important; }
+        .btn-action { background: var(--primary); color: white; width: 100%; border: none; margin-top: 1rem; font-weight: bold; }
+        .btn-action:hover { background: var(--primary-hover); }
 
-        /* 遊戲區域 */
-        #gameArea {
-            display: none;
-        }
+        /* Loading & Error */
+        #message-area { text-align: center; padding: 2rem; color: var(--text-light); }
 
-        /* 閃卡 (Flipcard) */
-        .flashcard-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 20px;
-        }
-        .flip-card {
-            background-color: transparent;
-            width: 100%;
-            max-width: 500px;
-            height: 300px;
-            perspective: 1000px;
-            cursor: pointer;
-        }
-        .flip-card-inner {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 15px;
-        }
-        .flip-card.flipped .flip-card-inner {
-            transform: rotateY(180deg);
-        }
-        .flip-card-front, .flip-card-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            -webkit-backface-visibility: hidden;
-            backface-visibility: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            box-sizing: border-box;
-            border-radius: 15px;
-            font-size: 1.5rem;
-        }
-        .flip-card-front {
-            background-color: white;
-            color: var(--text);
-        }
-        .flip-card-back {
-            background-color: var(--accent);
-            color: white;
-            transform: rotateY(180deg);
-            font-size: 2.5rem;
-            font-weight: bold;
-        }
+        /* --- 閃卡 (Flashcard) --- */
+        .flashcard-container { perspective: 1000px; width: 100%; aspect-ratio: 4/3; max-height: 400px; margin: 0 auto; cursor: pointer; }
+        .flashcard { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
+        .flashcard.is-flipped { transform: rotateY(180deg); }
+        .flashcard-face { position: absolute; width: 100%; height: 100%; backface-visibility: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; background-color: var(--surface); border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); padding: 2rem; }
+        .flashcard-front { font-size: 1.25rem; }
+        .flashcard-back { transform: rotateY(180deg); font-size: 2rem; font-weight: bold; color: var(--primary); }
+        .highlight { color: var(--error); font-weight: bold; font-size: 1.2em; }
+        
+        /* --- 選擇題 (MC) --- */
+        .mc-question { font-size: 1.25rem; background: var(--surface); padding: 1.5rem; border-radius: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 1rem; }
+        .mc-options { display: flex; flex-direction: column; gap: 0.5rem; }
+        .mc-option { text-align: left; transition: 0.2s; }
+        .mc-option:hover { background: #F9FAFB; }
+        .mc-option.correct { background: var(--success); color: white; border-color: var(--success); }
+        .mc-option.wrong { background: var(--error); color: white; border-color: var(--error); }
+        
+        /* --- 配對 (Matching) --- */
+        .match-container { display: flex; gap: 1rem; }
+        .match-column { flex: 1; display: flex; flex-direction: column; gap: 0.5rem; }
+        .match-item { text-align: left; font-size: 0.95rem; padding: 1rem; transition: 0.2s; word-break: break-word; }
+        .match-item.selected { background: var(--primary); color: white; border-color: var(--primary); transform: scale(1.02); }
+        .match-item.matched { visibility: hidden; } /* Hide when matched */
+        
+        /* Utilities */
+        .progress-text { text-align: center; margin-bottom: 1rem; color: var(--text-light); font-size: 0.9rem; }
 
-        /* 多項選擇 (MC) */
-        .mc-container {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            text-align: center;
-        }
-        .mc-question {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        .mc-options {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .mc-btn {
-            background: #ecf0f1;
-            border: 2px solid #bdc3c7;
-            padding: 15px;
-            font-size: 1.2rem;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .mc-btn:hover { background: #e0e6ed; }
-        .mc-btn.correct { background: var(--success); color: white; border-color: var(--success); }
-        .mc-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); }
         @media (max-width: 600px) {
-            .mc-options { grid-template-columns: 1fr; }
-        }
-
-        /* 配對 (Matching) */
-        .matching-container {
-            display: flex;
-            gap: 20px;
-        }
-        .match-col {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .match-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            border: 2px solid #ddd;
-            cursor: pointer;
-            text-align: center;
-            font-size: 1.1rem;
-            transition: 0.2s;
-            user-select: none;
-        }
-        .match-item:hover { border-color: var(--accent); }
-        .match-item.selected { background: var(--accent); color: white; border-color: var(--accent); }
-        .match-item.matched { background: var(--success); color: white; border-color: var(--success); visibility: hidden; opacity: 0; transition: visibility 0s 0.5s, opacity 0.5s linear;}
-        .match-item.error { animation: shake 0.5s; background: var(--danger); color: white; border-color: var(--danger); }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            50% { transform: translateX(5px); }
-            75% { transform: translateX(-5px); }
-        }
-
-        /* 檔案上傳按鈕美化 */
-        .file-upload-wrapper {
-            margin-bottom: 15px;
+            .match-container { flex-direction: column; }
+            .match-column:last-child .match-item { text-align: center; font-weight: bold; }
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>📖 語譯通</h1>
-    <p>文言文詞解練習系統</p>
-</header>
+    <header>
+        <h1>📖 語譯通</h1>
+        <p style="font-size: 0.9rem; opacity: 0.8;">文言文詞解練習工具</p>
+    </header>
 
-<div class="container">
-    <!-- 設定區域 -->
-    <div id="setupArea" class="setup-section">
-        <h2>載入字庫</h2>
-        <div class="file-upload-wrapper">
-            <label for="fileInput">選擇 data.txt 檔案：</label>
-            <input type="file" id="fileInput" accept=".txt">
+    <div class="controls-container">
+        <select id="lessonSelect" onchange="onLessonChange()">
+            <option value="all">所有課文 (載入中...)</option>
+        </select>
+        
+        <div class="mode-tabs">
+            <button id="tab-flashcard" class="active" onclick="setMode('flashcard')">閃卡</button>
+            <button id="tab-mc" onclick="setMode('mc')">選擇題</button>
+            <button id="tab-match" onclick="setMode('match')">配對</button>
         </div>
-        <p>或直接在下方貼上資料（格式：句子〈課文〉 解釋）：</p>
-        <textarea id="dataInput">對曰：「臣嘗有罪，【竊】計欲亡走燕。」〈廉頗〉	私下
-對曰：「臣嘗有罪，竊【計】欲亡走燕。」〈廉頗〉	打算
-對曰：「臣嘗有罪，竊計欲【亡】走燕。」〈廉頗〉	逃跑
-君不如【肉袒】伏斧質請罪，則幸得脫矣。〈廉頗〉	赤身
-君不如肉袒【伏】斧質請罪，則幸得脫矣。〈廉頗〉	俯伏
-君不如肉袒伏斧【質】請罪，則幸得脫矣。〈廉頗〉	鐵砧
-秦王以十五城請易寡人之璧，可予【不】？〈廉頗〉	否
-相如曰：「秦以城求璧而趙不許，【曲】在趙。」〈廉頗〉	理虧
-臣【語】曰：『臣嘗從大王與燕王會境上。」〈廉頗〉	告訴
-臣語曰：『臣【嘗】從大王與燕王會境上。」〈廉頗〉	曾經
-臣語曰：『臣嘗從大王與燕王【會】境上。」〈廉頗〉	相會
-臣語曰：『臣嘗從大王與燕王會【境】上。」〈廉頗〉	邊境
-臣等【不肖】，請辭去。〈廉頗〉	不才
-臣竊以為其人勇士，有智謀，【宜】可使。〈廉頗〉	適宜
-【均】之二策，寧許以負秦曲。〈廉頗〉	衡量</textarea>
-        <button class="btn" onclick="parseData()">開始練習</button>
     </div>
 
-    <!-- 遊戲區域 -->
-    <div id="gameArea">
-        <div class="controls">
-            <select id="lessonSelect" onchange="changeLesson()">
-                <option value="all">所有課文</option>
-            </select>
-            <div class="mode-btns">
-                <button class="btn mode-btn active" onclick="setMode('mc')">多項選擇</button>
-                <button class="btn mode-btn" onclick="setMode('matching')">配對</button>
-                <button class="btn mode-btn" onclick="setMode('flipcard')">閃卡</button>
+    <main>
+        <div id="message-area">資料載入中... 請稍候。</div>
+
+        <!-- 閃卡區域 -->
+        <div id="mode-flashcard" class="hidden">
+            <div class="progress-text" id="fc-progress"></div>
+            <div class="flashcard-container" onclick="toggleFlashcard()">
+                <div class="flashcard" id="flashcard-inner">
+                    <div class="flashcard-face flashcard-front" id="fc-front"></div>
+                    <div class="flashcard-face flashcard-back" id="fc-back"></div>
+                </div>
             </div>
+            <button class="btn-action" onclick="nextFlashcard()">下一個 (Next)</button>
         </div>
 
-        <div id="playZone">
-            <!-- 遊戲內容將由 JS 注入 -->
+        <!-- 選擇題區域 -->
+        <div id="mode-mc" class="hidden">
+            <div class="progress-text" id="mc-progress"></div>
+            <div class="mc-question" id="mc-question-text"></div>
+            <div class="mc-options" id="mc-options-container"></div>
+            <button class="btn-action hidden" id="btn-mc-next" onclick="nextMC()">下一個 (Next)</button>
         </div>
-    </div>
-</div>
 
-<script>
-    let vocabularyData = [];
-    let filteredData = [];
-    let currentMode = 'mc';
-    let lessons = new Set();
+        <!-- 配對區域 -->
+        <div id="mode-match" class="hidden">
+            <div class="progress-text" id="match-progress">請點擊左方句子，再點擊右方對應的解釋</div>
+            <div class="match-container">
+                <div class="match-column" id="match-col-left"></div>
+                <div class="match-column" id="match-col-right"></div>
+            </div>
+            <button class="btn-action hidden" id="btn-match-next" onclick="initMatchMode()">下一組 (Next Round)</button>
+        </div>
+    </main>
 
-    // 處理 txt 檔案上傳
-    document.getElementById('fileInput').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('dataInput').value = e.target.result;
+    <script>
+        // --- 核心資料變數 ---
+        let rawData = [];      // 儲存所有資料
+        let currentData = [];  // 當前選定課文的資料
+        let lessons = new Set();
+        let currentMode = 'flashcard';
+        
+        // 模式共用變數
+        let currentIndex = 0;
+        let shuffledData = [];
+
+        // 配對模式專用變數
+        let matchSelectedLeft = null;
+        let matchSelectedRight = null;
+        let matchItemsLeft = 5; // 每次顯示對數
+
+        // --- 初始化與資料讀取 ---
+        window.onload = () => {
+            fetchData();
         };
-        reader.readAsText(file);
-    });
 
-    // 解析資料
-    function parseData() {
-        const rawData = document.getElementById('dataInput').value;
-        const lines = rawData.split('\n');
-        vocabularyData = [];
-        lessons.clear();
+        async function fetchData() {
+            try {
+                // 為了避免緩存，加上時間戳記（可選）
+                const response = await fetch('data.txt?' + new Date().getTime());
+                if (!response.ok) throw new Error('網絡回應不成功');
+                const text = await response.text();
+                parseData(text);
+            } catch (error) {
+                document.getElementById('message-area').innerHTML = 
+                    `<span style="color:var(--error)">無法讀取 data.txt。<br>請確保 data.txt 檔案存在於相同資料夾，並且您正在透過伺服器 (如 GitHub Pages) 瀏覽此網頁。</span>`;
+                console.error('Error fetching data:', error);
+            }
+        }
 
-        // 正規表達式：解析 "句子〈課名〉(空白/Tab)解釋"
-        const regex = /^(.*?)〈(.*?)〉\s+(.*)$/;
+        function parseData(text) {
+            const lines = text.split('\n');
+            // 正則表達式：捕捉句子、〈課名〉、以及後面的答案 (支援 Tab 或多個空白分隔)
+            // 例子：對曰：「臣嘗有罪，【竊】計欲亡走燕。」〈廉頗〉   私下
+            const regex = /^(.*?)〈(.*?)〉\s+(.*)$/;
+            
+            rawData = [];
+            lessons.clear();
 
-        lines.forEach((line, index) => {
-            if (!line.trim()) return; // 跳過空行
-            const match = line.match(regex);
-            if (match) {
-                let sentence = match[1].trim();
-                const lesson = match[2].trim();
-                const meaning = match[3].trim();
+            lines.forEach(line => {
+                line = line.trim();
+                if (!line) return;
                 
-                // 把【】內的字變成 HTML 高亮標籤
-                const displaySentence = sentence.replace(/【(.*?)】/g, '<span class="highlight">【$1】</span>');
+                const match = line.match(regex);
+                if (match) {
+                    let sentence = match[1].trim();
+                    // 將 【字】 替換為帶顏色的 HTML
+                    sentence = sentence.replace(/【(.*?)】/g, '<span class="highlight">【$1】</span>');
+                    
+                    const lesson = match[2].trim();
+                    const answer = match[3].trim();
+                    
+                    rawData.push({ sentence, lesson, answer, rawSentence: match[1].trim() });
+                    lessons.add(lesson);
+                }
+            });
 
-                vocabularyData.push({
-                    id: index,
-                    sentence: displaySentence,
-                    lesson: lesson,
-                    meaning: meaning,
-                    rawSentence: sentence
-                });
-                lessons.add(lesson);
+            if (rawData.length === 0) {
+                document.getElementById('message-area').innerText = '在 data.txt 中找不到有效的格式資料。';
+                return;
             }
-        });
 
-        if (vocabularyData.length === 0) {
-            alert('無法解析資料，請檢查格式是否正確！');
-            return;
+            // 建立下拉選單
+            const select = document.getElementById('lessonSelect');
+            select.innerHTML = '<option value="all">所有課文 (' + rawData.length + ' 題)</option>';
+            lessons.forEach(lesson => {
+                let count = rawData.filter(d => d.lesson === lesson).length;
+                const option = document.createElement('option');
+                option.value = lesson;
+                option.textContent = `〈${lesson}〉 (${count} 題)`;
+                select.appendChild(option);
+            });
+
+            document.getElementById('message-area').classList.add('hidden');
+            onLessonChange(); // 載入預設資料並啟動
         }
 
-        // 更新下拉選單
-        const select = document.getElementById('lessonSelect');
-        select.innerHTML = '<option value="all">所有課文</option>';
-        lessons.forEach(lesson => {
-            select.innerHTML += `<option value="${lesson}">${lesson}</option>`;
-        });
-
-        document.getElementById('setupArea').style.display = 'none';
-        document.getElementById('gameArea').style.display = 'block';
-        
-        changeLesson();
-    }
-
-    // 切換課文
-    function changeLesson() {
-        const selectedLesson = document.getElementById('lessonSelect').value;
-        if (selectedLesson === 'all') {
-            filteredData = [...vocabularyData];
-        } else {
-            filteredData = vocabularyData.filter(item => item.lesson === selectedLesson);
-        }
-        renderGame();
-    }
-
-    // 切換模式
-    function setMode(mode) {
-        currentMode = mode;
-        document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-        event.target.classList.add('active');
-        renderGame();
-    }
-
-    // 渲染遊戲區域
-    function renderGame() {
-        const playZone = document.getElementById('playZone');
-        playZone.innerHTML = '';
-        
-        if (filteredData.length === 0) return;
-
-        if (currentMode === 'flipcard') initFlipcard(playZone);
-        else if (currentMode === 'mc') initMC(playZone);
-        else if (currentMode === 'matching') initMatching(playZone);
-    }
-
-    // ==========================================
-    // 閃卡模式 (Flipcard)
-    // ==========================================
-    let currentCardIndex = 0;
-    function initFlipcard(container) {
-        currentCardIndex = 0;
-        // 打亂順序
-        const cards = shuffleArray([...filteredData]);
-        
-        container.innerHTML = `
-            <div class="flashcard-container">
-                <div class="flip-card" onclick="this.classList.toggle('flipped')">
-                    <div class="flip-card-inner">
-                        <div class="flip-card-front" id="fc-front"></div>
-                        <div class="flip-card-back" id="fc-back"></div>
-                    </div>
-                </div>
-                <div>
-                    <button class="btn" onclick="nextCard(-1)">上一張</button>
-                    <span id="fc-counter" style="margin: 0 15px;"></span>
-                    <button class="btn" onclick="nextCard(1)">下一張</button>
-                </div>
-            </div>
-        `;
-        
-        window.flashcardsData = cards; // 暫存打亂的資料
-        updateCard();
-    }
-
-    function updateCard() {
-        const card = document.querySelector('.flip-card');
-        card.classList.remove('flipped'); // 重置翻轉狀態
-        
-        setTimeout(() => {
-            document.getElementById('fc-front').innerHTML = flashcardsData[currentCardIndex].sentence;
-            document.getElementById('fc-back').innerText = flashcardsData[currentCardIndex].meaning;
-            document.getElementById('fc-counter').innerText = `${currentCardIndex + 1} / ${flashcardsData.length}`;
-        }, 150);
-    }
-
-    window.nextCard = function(step) {
-        currentCardIndex += step;
-        if (currentCardIndex < 0) currentCardIndex = flashcardsData.length - 1;
-        if (currentCardIndex >= flashcardsData.length) currentCardIndex = 0;
-        updateCard();
-    }
-
-    // ==========================================
-    // 多項選擇模式 (MC)
-    // ==========================================
-    function initMC(container) {
-        if (filteredData.length < 2) {
-            container.innerHTML = '<p style="text-align:center;">此課文詞彙太少，無法進行MC練習。</p>';
-            return;
-        }
-
-        // 隨機選一題
-        const questionItem = filteredData[Math.floor(Math.random() * filteredData.length)];
-        
-        // 產生選項 (1個正確 + 3個錯誤)
-        let options = [questionItem.meaning];
-        let wrongCandidates = vocabularyData.filter(item => item.meaning !== questionItem.meaning);
-        wrongCandidates = shuffleArray(wrongCandidates);
-        
-        for (let i = 0; i < 3 && i < wrongCandidates.length; i++) {
-            if (!options.includes(wrongCandidates[i].meaning)) {
-                options.push(wrongCandidates[i].meaning);
+        function onLessonChange() {
+            const selectedLesson = document.getElementById('lessonSelect').value;
+            if (selectedLesson === 'all') {
+                currentData = [...rawData];
+            } else {
+                currentData = rawData.filter(item => item.lesson === selectedLesson);
             }
+            // 重新啟動當前模式
+            setMode(currentMode);
         }
-        
-        options = shuffleArray(options);
 
-        let html = `
-            <div class="mc-container">
-                <div class="mc-question">${questionItem.sentence}</div>
-                <div class="mc-options">
-        `;
-        
-        options.forEach(opt => {
-            html += `<button class="mc-btn" onclick="checkMC(this, '${opt}', '${questionItem.meaning}')">${opt}</button>`;
-        });
+        // --- UI 控制 ---
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // 更新 Tabs 樣式
+            document.querySelectorAll('.mode-tabs button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + mode).classList.add('active');
 
-        html += `
-                </div>
-                <button class="btn" style="margin-top: 20px; display:none;" id="nextMcBtn" onclick="renderGame()">下一題</button>
-            </div>
-        `;
-        container.innerHTML = html;
-    }
+            // 隱藏所有模式內容
+            document.getElementById('mode-flashcard').classList.add('hidden');
+            document.getElementById('mode-mc').classList.add('hidden');
+            document.getElementById('mode-match').classList.add('hidden');
+            
+            // 顯示選擇的模式
+            document.getElementById('mode-' + mode).classList.remove('hidden');
 
-    window.checkMC = function(btn, selected, correct) {
-        const allBtns = document.querySelectorAll('.mc-btn');
-        allBtns.forEach(b => b.disabled = true); // 禁用所有按鈕
+            // 打亂當前資料陣列順序
+            shuffledData = shuffleArray([...currentData]);
+            currentIndex = 0;
 
-        if (selected === correct) {
-            btn.classList.add('correct');
-        } else {
-            btn.classList.add('wrong');
-            // 找出正確答案並標示綠色
-            allBtns.forEach(b => {
-                if (b.innerText === correct) b.classList.add('correct');
+            // 初始化該模式
+            if (mode === 'flashcard') initFlashcard();
+            if (mode === 'mc') initMC();
+            if (mode === 'match') initMatchMode();
+        }
+
+        // --- 工具函數：打亂陣列 ---
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // ==========================================
+        // 1. 閃卡模式 (Flashcard)
+        // ==========================================
+        function initFlashcard() {
+            if (shuffledData.length === 0) return;
+            const cardInner = document.getElementById('flashcard-inner');
+            cardInner.classList.remove('is-flipped');
+            
+            const item = shuffledData[currentIndex];
+            document.getElementById('fc-front').innerHTML = item.sentence;
+            document.getElementById('fc-back').innerHTML = item.answer;
+            document.getElementById('fc-progress').innerText = `進度: ${currentIndex + 1} / ${shuffledData.length}`;
+        }
+
+        function toggleFlashcard() {
+            document.getElementById('flashcard-inner').classList.toggle('is-flipped');
+        }
+
+        function nextFlashcard() {
+            currentIndex++;
+            if (currentIndex >= shuffledData.length) {
+                currentIndex = 0; // 循環播放
+                shuffledData = shuffleArray([...currentData]); // 重新洗牌
+            }
+            initFlashcard();
+        }
+
+        // ==========================================
+        // 2. 選擇題模式 (Multiple Choice)
+        // ==========================================
+        function initMC() {
+            if (shuffledData.length === 0) return;
+            document.getElementById('btn-mc-next').classList.add('hidden');
+            
+            const item = shuffledData[currentIndex];
+            document.getElementById('mc-question-text').innerHTML = item.sentence;
+            document.getElementById('mc-progress').innerText = `進度: ${currentIndex + 1} / ${shuffledData.length}`;
+
+            // 生成選項：1個對，3個錯 (從所有資料中隨機抽錯的答案，以免單課資料不足4題)
+            let options = [item.answer];
+            let attempts = 0;
+            while(options.length < 4 && attempts < 100) {
+                let randomItem = rawData[Math.floor(Math.random() * rawData.length)];
+                if (!options.includes(randomItem.answer)) {
+                    options.push(randomItem.answer);
+                }
+                attempts++;
+            }
+            options = shuffleArray(options);
+
+            const container = document.getElementById('mc-options-container');
+            container.innerHTML = '';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('button');
+                btn.className = 'mc-option';
+                btn.innerText = opt;
+                btn.onclick = () => checkMCAnswer(btn, opt, item.answer);
+                container.appendChild(btn);
             });
         }
-        document.getElementById('nextMcBtn').style.display = 'inline-block';
-    }
 
-    // ==========================================
-    // 配對模式 (Matching)
-    // ==========================================
-    let matchSelection = { left: null, right: null };
-    let matchPairsLeft = 0;
+        function checkMCAnswer(btn, selected, correct) {
+            // 防止重複點擊
+            if (btn.parentNode.dataset.answered === "true") return;
+            btn.parentNode.dataset.answered = "true";
 
-    function initMatching(container) {
-        // 每次取最多 5 題出來配對
-        let poolSize = Math.min(5, filteredData.length);
-        if(poolSize === 0) return;
+            const allBtns = document.getElementById('mc-options-container').querySelectorAll('.mc-option');
+            allBtns.forEach(b => {
+                b.disabled = true;
+                if (b.innerText === correct) {
+                    b.classList.add('correct');
+                } else if (b === btn && selected !== correct) {
+                    b.classList.add('wrong');
+                }
+            });
 
-        let sample = shuffleArray([...filteredData]).slice(0, poolSize);
-        matchPairsLeft = poolSize;
-        matchSelection = { left: null, right: null };
+            document.getElementById('btn-mc-next').classList.remove('hidden');
+        }
 
-        let leftCol = shuffleArray([...sample]);
-        let rightCol = shuffleArray([...sample]);
+        function nextMC() {
+            document.getElementById('mc-options-container').dataset.answered = "false";
+            currentIndex++;
+            if (currentIndex >= shuffledData.length) {
+                alert('已完成所有選擇題！將重新開始。');
+                currentIndex = 0;
+                shuffledData = shuffleArray([...currentData]);
+            }
+            initMC();
+        }
 
-        let html = `<div class="matching-container">`;
-        
-        // 左排：句子
-        html += `<div class="match-col">`;
-        leftCol.forEach(item => {
-            html += `<div class="match-item left-item" data-id="${item.id}" onclick="selectMatch(this, 'left')">${item.sentence}</div>`;
-        });
-        html += `</div>`;
+        // ==========================================
+        // 3. 配對模式 (Matching)
+        // ==========================================
+        let currentMatchPairs = [];
+        let matchedCount = 0;
 
-        // 右排：解釋
-        html += `<div class="match-col">`;
-        rightCol.forEach(item => {
-            html += `<div class="match-item right-item" data-id="${item.id}" onclick="selectMatch(this, 'right')">${item.meaning}</div>`;
-        });
-        html += `</div></div>`;
-        html += `<div style="text-align:center; margin-top:20px;">
-                    <button class="btn" id="nextMatchBtn" style="display:none;" onclick="renderGame()">下一組</button>
-                 </div>`;
+        function initMatchMode() {
+            if (shuffledData.length === 0) return;
+            document.getElementById('btn-match-next').classList.add('hidden');
+            matchSelectedLeft = null;
+            matchSelectedRight = null;
+            matchedCount = 0;
 
-        container.innerHTML = html;
-    }
+            // 抽取5題作為一組
+            currentMatchPairs = [];
+            for (let i = 0; i < 5; i++) {
+                if (currentIndex >= shuffledData.length) {
+                    currentIndex = 0;
+                    shuffledData = shuffleArray([...currentData]); // 若題庫耗盡重新洗牌
+                }
+                currentMatchPairs.push(shuffledData[currentIndex]);
+                currentIndex++;
+            }
 
-    window.selectMatch = function(element, side) {
-        // 如果已經配對成功，不可點擊
-        if (element.classList.contains('matched')) return;
+            // 準備左右兩邊的資料並打亂
+            let leftItems = currentMatchPairs.map(item => ({ id: item.rawSentence, html: item.sentence }));
+            let rightItems = currentMatchPairs.map(item => ({ id: item.rawSentence, text: item.answer }));
+            
+            leftItems = shuffleArray(leftItems);
+            rightItems = shuffleArray(rightItems);
 
-        // 取消同側其他選項的選取狀態
-        document.querySelectorAll(`.match-item.${side}-item`).forEach(el => el.classList.remove('selected'));
-        
-        element.classList.add('selected');
-        matchSelection[side] = element;
+            const colLeft = document.getElementById('match-col-left');
+            const colRight = document.getElementById('match-col-right');
+            colLeft.innerHTML = '';
+            colRight.innerHTML = '';
 
-        // 如果左右都選了，檢查是否匹配
-        if (matchSelection.left && matchSelection.right) {
-            const idLeft = matchSelection.left.getAttribute('data-id');
-            const idRight = matchSelection.right.getAttribute('data-id');
+            leftItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'match-item';
+                btn.innerHTML = item.html;
+                btn.dataset.id = item.id;
+                btn.dataset.side = 'left';
+                btn.onclick = () => handleMatchClick(btn);
+                colLeft.appendChild(btn);
+            });
 
-            if (idLeft === idRight) {
-                // 正確
-                matchSelection.left.classList.remove('selected');
-                matchSelection.right.classList.remove('selected');
-                matchSelection.left.classList.add('matched');
-                matchSelection.right.classList.add('matched');
-                matchPairsLeft--;
-                
-                if (matchPairsLeft === 0) {
-                    document.getElementById('nextMatchBtn').style.display = 'inline-block';
+            rightItems.forEach(item => {
+                const btn = document.createElement('button');
+                btn.className = 'match-item';
+                btn.innerText = item.text;
+                btn.dataset.id = item.id;
+                btn.dataset.side = 'right';
+                btn.onclick = () => handleMatchClick(btn);
+                colRight.appendChild(btn);
+            });
+        }
+
+        function handleMatchClick(btn) {
+            const side = btn.dataset.side;
+
+            // 取消選取已選的同側按鈕
+            if (side === 'left') {
+                if (matchSelectedLeft) matchSelectedLeft.classList.remove('selected');
+                matchSelectedLeft = btn;
+            } else {
+                if (matchSelectedRight) matchSelectedRight.classList.remove('selected');
+                matchSelectedRight = btn;
+            }
+            
+            btn.classList.add('selected');
+
+            // 檢查是否兩邊都已選取
+            if (matchSelectedLeft && matchSelectedRight) {
+                setTimeout(() => { checkMatch(); }, 300); // 稍微延遲讓使用者看到選取效果
+            }
+        }
+
+        function checkMatch() {
+            if (matchSelectedLeft.dataset.id === matchSelectedRight.dataset.id) {
+                // 配對成功
+                matchSelectedLeft.classList.add('matched');
+                matchSelectedRight.classList.add('matched');
+                matchedCount++;
+
+                if (matchedCount === currentMatchPairs.length) {
+                    document.getElementById('btn-match-next').classList.remove('hidden');
                 }
             } else {
-                // 錯誤 (閃紅燈後取消選取)
-                let l = matchSelection.left;
-                let r = matchSelection.right;
-                l.classList.remove('selected');
-                r.classList.remove('selected');
-                l.classList.add('error');
-                r.classList.add('error');
-                
-                setTimeout(() => {
-                    l.classList.remove('error');
-                    r.classList.remove('error');
-                }, 500);
+                // 配對失敗：震動效果或直接取消選取
+                matchSelectedLeft.classList.remove('selected');
+                matchSelectedRight.classList.remove('selected');
             }
-            // 重置選擇
-            matchSelection = { left: null, right: null };
+            
+            // 重置選取狀態
+            matchSelectedLeft = null;
+            matchSelectedRight = null;
         }
-    }
 
-    // 輔助函數：打亂陣列順序 (Fisher-Yates Shuffle)
-    function shuffleArray(array) {
-        for (let i = array.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
-        }
-        return array;
-    }
-</script>
-
+    </script>
 </body>
 </html>
